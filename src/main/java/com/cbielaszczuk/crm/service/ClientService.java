@@ -5,6 +5,8 @@ import com.cbielaszczuk.crm.mapper.ClientMapper;
 import com.cbielaszczuk.crm.model.ClientModel;
 import com.cbielaszczuk.crm.repository.ClientRepository;
 import com.cbielaszczuk.crm.validation.ClientValidator;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 /**
  * Handles business logic for managing clients.
  */
+@Service
+@Transactional
 public class ClientService {
 
     private final ClientRepository repository;
@@ -36,8 +40,9 @@ public class ClientService {
      *
      * @return list of client DTOs
      */
+    @Transactional(readOnly = true)
     public List<ClientDTO> getAllClients() {
-        return repository.getAll()
+        return repository.findAllActive()
                 .stream()
                 .map(ClientMapper::toDTO)
                 .collect(Collectors.toList());
@@ -49,9 +54,11 @@ public class ClientService {
      * @param id client ID
      * @return DTO if found, null otherwise
      */
-    public ClientDTO getClientById(int id) {
-        ClientModel model = repository.getById(id);
-        return model != null ? ClientMapper.toDTO(model) : null;
+    @Transactional(readOnly = true)
+    public ClientDTO getClientById(Long id) {
+        return repository.findById(id)
+                .map(ClientMapper::toDTO)
+                .orElse(null);
     }
 
     /**
@@ -62,7 +69,7 @@ public class ClientService {
     public void updateClient(ClientDTO dto) {
         ClientValidator.validateForUpdate(dto);
         ClientModel model = ClientMapper.toModel(dto);
-        repository.update(model);
+        repository.save(model);
     }
 
     /**
@@ -70,8 +77,8 @@ public class ClientService {
      *
      * @param id ID of the client to delete
      */
-    public void deleteClient(int id) {
+    public void deleteClient(Long id) {
         ClientValidator.validateForDelete(id);
-        repository.delete(id);
+        repository.deleteById(id);
     }
 }

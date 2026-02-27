@@ -11,20 +11,20 @@ class UserValidatorTest {
 
     @Test
     void validateForCreateOrUpdate_valid_shouldPass() {
-        UserDTO dto = new UserDTO(1, "Test", "test@email.com", "123", "user", "pass");
+        UserDTO dto = new UserDTO(1L, "Test", "test@email.com", "123", "user", "pass");
         assertDoesNotThrow(() -> UserValidator.validateForCreateOrUpdate(dto));
     }
 
     @Test
     void validateForCreateOrUpdate_blankEmail_shouldThrow() {
-        UserDTO dto = new UserDTO(1, "Test", "", "123", "user", "pass");
+        UserDTO dto = new UserDTO(1L, "Test", "", "123", "user", "pass");
         Exception ex = assertThrows(IllegalArgumentException.class, () -> UserValidator.validateForCreateOrUpdate(dto));
         assertEquals("A valid email is required.", ex.getMessage());
     }
 
     @Test
     void validateForDelete_invalidId_shouldThrow() {
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> UserValidator.validateForDelete(0));
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> UserValidator.validateForDelete(0L));
         assertEquals("Valid user ID is required for deletion.", ex.getMessage());
     }
 

@@ -1,21 +1,22 @@
 package com.cbielaszczuk.crm.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class UserModel extends PersonModel {
 
+    @Column(nullable = false, unique = true)
     private String username;
+
+    @Column(nullable = false)
     private String password;
 
-    /**
-     * Constructs a new UserModel with all required fields.
-     *
-     * @param id        unique identifier of the user
-     * @param name      full name of the user
-     * @param email     user's email address
-     * @param phone     user's phone number
-     * @param username  login username
-     * @param password  login password
-     */
-    public UserModel(int id, String name, String email, String phone, String username, String password) {
+    public UserModel() {
+        super();
+    }
+
+    public UserModel(Long id, String name, String email, String phone, String username, String password) {
         super(id, name, email, phone);
         this.username = username;
         this.password = password;

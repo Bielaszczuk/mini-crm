@@ -7,10 +7,14 @@ import com.cbielaszczuk.crm.mapper.UserMapper;
 import com.cbielaszczuk.crm.model.UserModel;
 import com.cbielaszczuk.crm.repository.UserRepository;
 import com.cbielaszczuk.crm.validation.UserValidator;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class UserService {
 
     private final UserRepository repository;
@@ -24,7 +28,7 @@ public class UserService {
      */
     public void register(UserRegistrationDTO registrationDTO) {
         UserValidator.validateRegistration(registrationDTO);
-        UserDTO dto = new UserDTO(0,
+        UserDTO dto = new UserDTO(0L,
                 registrationDTO.getName(),
                 registrationDTO.getEmail(),
                 registrationDTO.getPhone(),
@@ -38,10 +42,13 @@ public class UserService {
     /**
      * Authenticates a user by username and password.
      */
+    @Transactional(readOnly = true)
     public UserDTO login(UserLoginDTO loginDTO) {
         UserValidator.validateLogin(loginDTO);
-        UserModel model = repository.findByUsername(loginDTO.getUsername());
-        if (model == null || !model.getPassword().equals(loginDTO.getPassword())) {
+        UserModel model = repository.findByUsername(loginDTO.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password."));
+        
+        if (!model.getPassword().equals(loginDTO.getPassword())) {
             throw new IllegalArgumentException("Invalid username or password.");
         }
         return UserMapper.toDTO(model);
@@ -50,8 +57,9 @@ public class UserService {
     /**
      * Returns all users as DTOs.
      */
+    @Transactional(readOnly = true)
     public List<UserDTO> getAllUsers() {
-        return repository.getAll().stream()
+        return repository.findAll().stream()
                 .map(UserMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -59,8 +67,10 @@ public class UserService {
     /**
      * Returns a single user by ID.
      */
-    public UserDTO getUserById(int id) {
-        UserModel model = repository.getById(id);
+    @Transactional(readOnly = true)
+    public UserDTO getUserById(Long id) {
+        UserModel model = repository.findById(id)
+                .orElse(null);
         return model != null ? UserMapper.toDTO(model) : null;
     }
 
@@ -70,14 +80,14 @@ public class UserService {
     public void updateUser(UserDTO dto) {
         UserValidator.validateForCreateOrUpdate(dto);
         UserModel model = UserMapper.toModel(dto);
-        repository.update(model);
+        repository.save(model);
     }
 
     /**
      * Soft-deletes a user.
      */
-    public void deleteUser(int id) {
+    public void deleteUser(Long id) {
         UserValidator.validateForDelete(id);
-        repository.delete(id);
+        repository.deleteById(id);
     }
 }

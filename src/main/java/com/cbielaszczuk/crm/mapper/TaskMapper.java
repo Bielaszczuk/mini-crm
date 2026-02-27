@@ -14,28 +14,16 @@ public class TaskMapper {
     public static TaskModel toModel(TaskDTO dto) {
         if (dto == null) return null;
 
-        if (dto.getDeletedAt() == null) {
-            return new TaskModel(
-                    dto.getId(),
-                    dto.getTitle(),
-                    dto.getDescription(),
-                    dto.getStatus(),
-                    dto.getProjectId(),
-                    dto.getStartDate(),
-                    dto.getDueDate()
-            );
-        } else {
-            return new TaskModel(
-                    dto.getId(),
-                    dto.getTitle(),
-                    dto.getDescription(),
-                    dto.getStatus(),
-                    dto.getProjectId(),
-                    dto.getStartDate(),
-                    dto.getDueDate(),
-                    dto.getDeletedAt()
-            );
-        }
+        TaskModel model = new TaskModel();
+        model.setId(dto.getId());
+        model.setTitle(dto.getTitle());
+        model.setDescription(dto.getDescription());
+        model.setStatus(dto.getStatus());
+        model.setStartDate(dto.getStartDate());
+        model.setDueDate(dto.getDueDate());
+        model.setDeletedAt(dto.getDeletedAt());
+
+        return model;
     }
 
     /**

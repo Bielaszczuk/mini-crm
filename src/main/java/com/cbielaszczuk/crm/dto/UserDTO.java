@@ -5,7 +5,7 @@ package com.cbielaszczuk.crm.dto;
  */
 public class UserDTO {
 
-    private int id;
+    private Long id;
     private String name;
     private String email;
     private String phone;
@@ -22,7 +22,7 @@ public class UserDTO {
      * @param username  login username
      * @param password  login password
      */
-    public UserDTO(int id, String name, String email, String phone, String username, String password) {
+    public UserDTO(Long id, String name, String email, String phone, String username, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -31,13 +31,14 @@ public class UserDTO {
         this.password = password;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
+
 
     public String getName() {
         return name;

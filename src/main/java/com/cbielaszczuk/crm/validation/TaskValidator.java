@@ -60,8 +60,8 @@ public class TaskValidator {
      * @param id task ID
      * @throws IllegalArgumentException if ID is invalid
      */
-    public static void validateForDelete(int id) {
-        if (id <= 0) {
+    public static void validateForDelete(Long id) {
+        if (id == null || id <= 0) {
             throw new IllegalArgumentException("Valid task ID is required for deletion.");
         }
     }

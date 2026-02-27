@@ -1,40 +1,56 @@
 package com.cbielaszczuk.crm.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "projects")
 public class ProjectModel {
 
-    private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ProjectStatusEnum status;
-    private int clientId;
 
-    private LocalDate startDate;     // Opcional
-    private LocalDate dueDate;       // Opcional
-    private LocalDateTime deletedAt; // Soft delete
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
+    private ClientModel client;
 
-    // ———————————————————————————
-    // Constructor principal (solo campos requeridos)
-    // ———————————————————————————
-    public ProjectModel(Integer id, String title, String description, ProjectStatusEnum status, int clientId) {
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    public ProjectModel() {
+    }
+
+    public ProjectModel(Long id, String title, String description, ProjectStatusEnum status, ClientModel client) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
-        this.clientId = clientId;
+        this.client = client;
     }
 
-    // ———————————————————————————
-    // Getters & Setters
-    // ———————————————————————————
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -62,12 +78,16 @@ public class ProjectModel {
         this.status = status;
     }
 
-    public int getClientId() {
-        return clientId;
+    public ClientModel getClient() {
+        return client;
     }
 
-    public void setClientId(int clientId) {
-        this.clientId = clientId;
+    public void setClient(ClientModel client) {
+        this.client = client;
+    }
+
+    public Long getClientId() {
+        return client != null ? client.getId() : null;
     }
 
     public LocalDate getStartDate() {
@@ -94,3 +114,4 @@ public class ProjectModel {
         this.deletedAt = deletedAt;
     }
 }
+

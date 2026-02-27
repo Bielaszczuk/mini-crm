@@ -30,7 +30,6 @@ public class ClientValidator {
             throw new IllegalArgumentException("Phone number is required.");
         }
 
-        // Company and notes can be optional, but podés validar su tamaño si querés
         if (dto.getNotes() != null && dto.getNotes().length() > 1000) {
             throw new IllegalArgumentException("Notes must not exceed 1000 characters.");
         }
@@ -43,11 +42,11 @@ public class ClientValidator {
      * @throws IllegalArgumentException if validation fails
      */
     public static void validateForUpdate(ClientDTO dto) {
-        validateForCreate(dto); // Reusamos por ahora
+        validateForCreate(dto);
     }
 
-    public static void validateForDelete(int id) {
-        if (id <= 0) {
+    public static void validateForDelete(Long id) {
+        if (id == null || id <= 0) {
             throw new IllegalArgumentException("Valid client ID is required for deletion.");
         }
     }

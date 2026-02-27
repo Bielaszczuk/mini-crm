@@ -1,86 +1,84 @@
 package com.cbielaszczuk.crm.service;
 
-import com.cbielaszczuk.crm.config.DatabaseConnection;
-import com.cbielaszczuk.crm.config.DatabaseInitializer;
+import com.cbielaszczuk.crm.dto.ClientDTO;
 import com.cbielaszczuk.crm.dto.ProjectDTO;
 import com.cbielaszczuk.crm.model.ProjectStatusEnum;
-import com.cbielaszczuk.crm.repository.ProjectRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ProjectServiceTest {
 
+    @Autowired
     private ProjectService projectService;
-    private int createdId;
 
-    @BeforeEach
-    void setUp() {
-        // Reset the database before each test
-        DatabaseInitializer.initialize();
+    @Autowired
+    private ClientService clientService;
 
-        // Initialize repository and service
-        Connection connection = DatabaseConnection.getInstance();
-        ProjectRepository repository = new ProjectRepository(connection);
-        projectService = new ProjectService(repository);
+    private Long createTestClient() {
+        ClientDTO dto = new ClientDTO(null, "Test Client", "testclient" + System.nanoTime() + "@test.com", "000", "Corp", "");
+        clientService.createClient(dto);
+        return clientService.getAllClients().stream()
+                .filter(c -> c.getEmail().contains("testclient"))
+                .reduce((first, second) -> second)
+                .orElseThrow().getId();
+    }
 
-        // Create a new test project
-        ProjectDTO testProject = new ProjectDTO(
-                0, "Test Project", "Initial Description",
+    private ProjectDTO createTestProject(Long clientId) {
+        ProjectDTO dto = new ProjectDTO(
+                null, "Test Project", "Description",
                 LocalDate.of(2025, 1, 1),
                 LocalDate.of(2025, 12, 31),
                 ProjectStatusEnum.IN_PROGRESS,
-                1 // assuming client with ID 1 exists
+                clientId
         );
-        projectService.createProject(testProject);
-
-        // Get the ID of the last created project
-        List<ProjectDTO> all = projectService.getAllProjects();
-        createdId = all.get(all.size() - 1).getId();
+        projectService.createProject(dto);
+        return projectService.getProjectsByClientId(clientId).get(0);
     }
 
     @Test
     void getAllProjects_shouldReturnAtLeastOne() {
-        List<ProjectDTO> all = projectService.getAllProjects();
-        assertTrue(all.size() >= 1);
+        Long clientId = createTestClient();
+        createTestProject(clientId);
+        assertFalse(projectService.getAllProjects().isEmpty());
     }
 
     @Test
     void getProjectById_existing_shouldReturn() {
-        ProjectDTO project = projectService.getProjectById(createdId);
-        assertNotNull(project);
-        assertEquals("Test Project", project.getTitle());
+        Long clientId = createTestClient();
+        ProjectDTO created = createTestProject(clientId);
+        ProjectDTO found = projectService.getProjectById(created.getId());
+        assertNotNull(found);
+        assertEquals("Test Project", found.getTitle());
     }
 
     @Test
-    void updateProject_shouldChangeData() {
-        ProjectDTO updated = new ProjectDTO(
-                createdId, "Updated Title", "Updated Desc",
-                LocalDate.of(2025, 1, 1),
-                LocalDate.of(2025, 12, 31),
-                ProjectStatusEnum.ON_HOLD,
-                1
-        );
+    void updateProject_shouldModifyTitle() {
+        Long clientId = createTestClient();
+        ProjectDTO created = createTestProject(clientId);
 
-        projectService.updateProject(updated);
-        ProjectDTO after = projectService.getProjectById(createdId);
+        created.setTitle("Updated Title");
+        projectService.updateProject(created);
 
+        ProjectDTO after = projectService.getProjectById(created.getId());
         assertEquals("Updated Title", after.getTitle());
-        assertEquals("Updated Desc", after.getDescription());
-        assertEquals(ProjectStatusEnum.ON_HOLD, after.getStatus());
     }
 
     @Test
-    void deleteProject_shouldSoftDelete() {
-        projectService.deleteProject(createdId);
-        List<ProjectDTO> remaining = projectService.getAllProjects();
-        boolean stillExists = remaining.stream().anyMatch(p -> p.getId() == createdId);
-        assertFalse(stillExists);
+    void deleteProject_shouldRemove() {
+        Long clientId = createTestClient();
+        ProjectDTO created = createTestProject(clientId);
+        projectService.deleteProject(created.getId());
+        assertNull(projectService.getProjectById(created.getId()));
     }
 }

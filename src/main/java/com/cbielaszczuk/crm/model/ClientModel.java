@@ -1,24 +1,26 @@
 package com.cbielaszczuk.crm.model;
+
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "clients")
 public class ClientModel extends PersonModel {
 
+    @Column
     private String company;
+
+    @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    /**
-     * Constructs a new ClientModel with all relevant fields.
-     *
-     * @param id       unique identifier of the client
-     * @param name     full name of the client
-     * @param email    client's email address
-     * @param phone    client's phone number
-     * @param company  company the client belongs to
-     * @param notes    additional notes about the client
-     * @param deletedAt timestamp when the client was marked as deleted, if applicable
-     */
-    public ClientModel(int id, String name, String email, String phone, String company, String notes) {
+    public ClientModel() {
+        super();
+    }
+
+    public ClientModel(Long id, String name, String email, String phone, String company, String notes) {
         super(id, name, email, phone);
         this.company = company;
         this.notes = notes;

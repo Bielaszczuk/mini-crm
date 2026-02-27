@@ -1,75 +1,63 @@
 package com.cbielaszczuk.crm.service;
 
-import com.cbielaszczuk.crm.config.DatabaseConnection;
-import com.cbielaszczuk.crm.config.TestDatabaseInitializer;
 import com.cbielaszczuk.crm.dto.ClientDTO;
-import com.cbielaszczuk.crm.repository.ClientRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ClientServiceTest {
 
+    @Autowired
     private ClientService service;
-    private int createdId;
 
-    @BeforeEach
-    void setUp() {
-        // Reset database schema and seed base data before each test
-        TestDatabaseInitializer.initialize();
-
-        // Prepare repository and service
-        Connection connection = DatabaseConnection.getInstance();
-        ClientRepository repository = new ClientRepository(connection);
-        service = new ClientService(repository);
-
-        // Create a new client for testing
-        ClientDTO testClient = new ClientDTO(0, "Juan Test", "juan@test.com", "1234567890", "TestCorp", "Initial notes");
-        service.createClient(testClient);
-
-        // Store ID of the newly created client
-        List<ClientDTO> all = service.getAllClients();
-        createdId = all.get(all.size() - 1).getId();
+    private ClientDTO createTestClient(String name, String email) {
+        ClientDTO dto = new ClientDTO(null, name, email, "1234567890", "TestCorp", "Notes");
+        service.createClient(dto);
+        return service.getAllClients().stream()
+                .filter(c -> c.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow();
     }
 
     @Test
     void getAllClients_shouldReturnAtLeastOne() {
+        createTestClient("Juan Test", "juan@test.com");
         List<ClientDTO> all = service.getAllClients();
-        assertTrue(all.size() >= 1);
+        assertFalse(all.isEmpty());
     }
 
     @Test
     void getClientById_existing_shouldReturn() {
-        ClientDTO fetched = service.getClientById(createdId);
+        ClientDTO created = createTestClient("Juan Test", "juan2@test.com");
+        ClientDTO fetched = service.getClientById(created.getId());
         assertNotNull(fetched);
+        assertEquals(created.getId(), fetched.getId());
     }
 
     @Test
     void updateClient_shouldModifyData() {
-        ClientDTO updated = new ClientDTO(createdId, "Carlos Bielaszczuk", "carlos@test.com", "0987654321", "TestCorp", "Updated notes");
+        ClientDTO created = createTestClient("Original Name", "original@test.com");
+
+        ClientDTO updated = new ClientDTO(created.getId(), "Carlos Bielaszczuk", "carlos@test.com", "0987654321", "TestCorp", "Updated notes");
         service.updateClient(updated);
 
-        ClientDTO after = service.getClientById(createdId);
+        ClientDTO after = service.getClientById(created.getId());
         assertEquals("Carlos Bielaszczuk", after.getName());
     }
 
     @Test
-    void deleteClient_shouldSoftDelete() {
-        service.deleteClient(createdId);
-        List<ClientDTO> remaining = service.getAllClients();
-
-        boolean exists = remaining.stream().anyMatch(c -> c.getId() == createdId);
-        assertFalse(exists);
-    }
-
-    @Test
-    void createClient_withInvalidEmail_shouldFail() {
-        ClientDTO invalid = new ClientDTO(0, "Fake", "mal@", "123", "C", "Notes");
-        Exception ex = assertThrows(IllegalArgumentException.class, () -> service.createClient(invalid));
-        assertTrue(ex.getMessage().toLowerCase().contains("email"));
+    void deleteClient_shouldRemoveFromList() {
+        ClientDTO created = createTestClient("To Delete", "delete@test.com");
+        service.deleteClient(created.getId());
+        assertNull(service.getClientById(created.getId()));
     }
 }

@@ -1,28 +1,25 @@
 package com.cbielaszczuk.crm.service;
 
-import com.cbielaszczuk.crm.config.DatabaseConnection;
-import com.cbielaszczuk.crm.config.TestDatabaseInitializer;
 import com.cbielaszczuk.crm.dto.UserDTO;
 import com.cbielaszczuk.crm.dto.UserLoginDTO;
 import com.cbielaszczuk.crm.dto.UserRegistrationDTO;
-import com.cbielaszczuk.crm.repository.UserRepository;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class UserServiceTest {
 
-    private static UserService service;
-
-    @BeforeAll
-    static void setup() {
-        TestDatabaseInitializer.initialize();
-        Connection conn = DatabaseConnection.getTestInstance();
-        service = new UserService(new UserRepository(conn));
-    }
+    @Autowired
+    private UserService service;
 
     @Test
     void register_shouldPersistUser() {
@@ -33,47 +30,65 @@ class UserServiceTest {
         assertDoesNotThrow(() -> service.register(dto));
 
         List<UserDTO> all = service.getAllUsers();
-        boolean exists = all.stream().anyMatch(u -> u.getUsername().equals("juantest"));
-        assertTrue(exists);
+        assertTrue(all.stream().anyMatch(u -> u.getUsername().equals("juantest")));
     }
 
     @Test
-    void login_shouldReturnUser() {
-        UserLoginDTO login = new UserLoginDTO("admin", "admin123");
+    void login_shouldReturnUserOnValidCredentials() {
+        UserRegistrationDTO reg = new UserRegistrationDTO(
+                "Login User", "loginuser@test.com", "000", "loginuser", "pass123", "pass123"
+        );
+        service.register(reg);
+
+        UserLoginDTO login = new UserLoginDTO("loginuser", "pass123");
         UserDTO user = service.login(login);
 
         assertNotNull(user);
-        assertEquals("admin", user.getUsername());
+        assertEquals("loginuser", user.getUsername());
+    }
+
+    @Test
+    void login_shouldThrowOnInvalidPassword() {
+        UserRegistrationDTO reg = new UserRegistrationDTO(
+                "Login User2", "loginuser2@test.com", "000", "loginuser2", "pass123", "pass123"
+        );
+        service.register(reg);
+
+        UserLoginDTO login = new UserLoginDTO("loginuser2", "wrongpassword");
+        assertThrows(IllegalArgumentException.class, () -> service.login(login));
     }
 
     @Test
     void updateUser_shouldChangeData() {
-        List<UserDTO> users = service.getAllUsers();
-        UserDTO user = users.get(0);
+        UserRegistrationDTO reg = new UserRegistrationDTO(
+                "Original Name", "original@test.com", "111", "usertoUpdate", "pass", "pass"
+        );
+        service.register(reg);
 
-        user.setName("New Name");
-        user.setEmail("new@email.com");
+        List<UserDTO> all = service.getAllUsers();
+        UserDTO user = all.stream().filter(u -> u.getUsername().equals("usertoUpdate")).findFirst().orElseThrow();
+
+        user.setName("Updated Name");
+        user.setEmail("updated@test.com");
         service.updateUser(user);
 
         UserDTO updated = service.getUserById(user.getId());
-        assertEquals("New Name", updated.getName());
-        assertEquals("new@email.com", updated.getEmail());
+        assertEquals("Updated Name", updated.getName());
+        assertEquals("updated@test.com", updated.getEmail());
     }
 
     @Test
-    void deleteUser_shouldRemoveFromList() {
-        UserRegistrationDTO dto = new UserRegistrationDTO(
-                "ToDelete", "del@test.com", "777", "todelete", "pass", "pass"
+    void deleteUser_shouldRemoveUser() {
+        UserRegistrationDTO reg = new UserRegistrationDTO(
+                "To Delete", "delete@test.com", "222", "userToDelete", "pass", "pass"
         );
-        service.register(dto);
+        service.register(reg);
 
-        UserDTO toDelete = service.getAllUsers().stream()
-                .filter(u -> u.getUsername().equals("todelete"))
-                .findFirst().orElseThrow();
+        List<UserDTO> before = service.getAllUsers();
+        UserDTO user = before.stream().filter(u -> u.getUsername().equals("userToDelete")).findFirst().orElseThrow();
 
-        service.deleteUser(toDelete.getId());
+        service.deleteUser(user.getId());
 
-        List<UserDTO> all = service.getAllUsers();
-        assertFalse(all.stream().anyMatch(u -> u.getId() == toDelete.getId()));
+        assertNull(service.getUserById(user.getId()));
     }
 }

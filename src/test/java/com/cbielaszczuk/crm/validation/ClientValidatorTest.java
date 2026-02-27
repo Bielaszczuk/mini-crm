@@ -9,7 +9,7 @@ class ClientValidatorTest {
 
     @Test
     void testValidateForCreate_validData_shouldPass() {
-        ClientDTO dto = new ClientDTO(1, "Juan", "juan@test.com", "123456789", "Empresa", "Notas");
+        ClientDTO dto = new ClientDTO(1L, "Juan", "juan@test.com", "123456789", "Empresa", "Notas");
         assertDoesNotThrow(() -> ClientValidator.validateForCreate(dto));
     }
 
@@ -22,7 +22,7 @@ class ClientValidatorTest {
 
     @Test
     void testValidateForCreate_blankName_shouldThrowException() {
-        ClientDTO dto = new ClientDTO(1, " ", "juan@test.com", "123456789", "Empresa", "Notas");
+        ClientDTO dto = new ClientDTO(1L, " ", "juan@test.com", "123456789", "Empresa", "Notas");
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> ClientValidator.validateForCreate(dto));
         assertEquals("Client name is required.", exception.getMessage());
@@ -30,7 +30,7 @@ class ClientValidatorTest {
 
     @Test
     void testValidateForCreate_invalidEmail_shouldThrowException() {
-        ClientDTO dto = new ClientDTO(1, "Juan", "noemail", "123456789", "Empresa", "Notas");
+        ClientDTO dto = new ClientDTO(1L, "Juan", "noemail", "123456789", "Empresa", "Notas");
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> ClientValidator.validateForCreate(dto));
         assertEquals("A valid email is required.", exception.getMessage());
@@ -38,7 +38,7 @@ class ClientValidatorTest {
 
     @Test
     void testValidateForCreate_blankPhone_shouldThrowException() {
-        ClientDTO dto = new ClientDTO(1, "Juan", "juan@test.com", " ", "Empresa", "Notas");
+        ClientDTO dto = new ClientDTO(1L, "Juan", "juan@test.com", " ", "Empresa", "Notas");
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> ClientValidator.validateForCreate(dto));
         assertEquals("Phone number is required.", exception.getMessage());
@@ -47,7 +47,7 @@ class ClientValidatorTest {
     @Test
     void testValidateForCreate_notesTooLong_shouldThrowException() {
         String longNotes = "a".repeat(1001);
-        ClientDTO dto = new ClientDTO(1, "Juan", "juan@test.com", "123456789", "Empresa", longNotes);
+        ClientDTO dto = new ClientDTO(1L, "Juan", "juan@test.com", "123456789", "Empresa", longNotes);
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> ClientValidator.validateForCreate(dto));
         assertEquals("Notes must not exceed 1000 characters.", exception.getMessage());
@@ -56,12 +56,12 @@ class ClientValidatorTest {
     @Test
     void testValidateForDelete_invalidId_shouldThrowException() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> ClientValidator.validateForDelete(0));
+                () -> ClientValidator.validateForDelete(0L));
         assertEquals("Valid client ID is required for deletion.", exception.getMessage());
     }
 
     @Test
     void testValidateForDelete_validId_shouldPass() {
-        assertDoesNotThrow(() -> ClientValidator.validateForDelete(3));
+        assertDoesNotThrow(() -> ClientValidator.validateForDelete(3L));
     }
 }

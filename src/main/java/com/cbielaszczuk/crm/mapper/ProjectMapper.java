@@ -14,17 +14,13 @@ public class ProjectMapper {
     public static ProjectModel toModel(ProjectDTO dto) {
         if (dto == null) return null;
 
-        ProjectModel model = new ProjectModel(
-                dto.getId(),
-                dto.getTitle(),
-                dto.getDescription(),
-                dto.getStatus(),
-                dto.getClientId()
-        );
-
+        ProjectModel model = new ProjectModel();
+        model.setId(dto.getId());
+        model.setTitle(dto.getTitle());
+        model.setDescription(dto.getDescription());
+        model.setStatus(dto.getStatus());
         model.setStartDate(dto.getStartDate());
         model.setDueDate(dto.getDueDate());
-        model.setStatus(dto.getStatus());
 
         return model;
     }
@@ -38,7 +34,7 @@ public class ProjectMapper {
     public static ProjectDTO toDTO(ProjectModel model) {
         if (model == null) return null;
 
-        ProjectDTO dto = new ProjectDTO(
+        return new ProjectDTO(
                 model.getId(),
                 model.getTitle(),
                 model.getDescription(),
@@ -47,7 +43,5 @@ public class ProjectMapper {
                 model.getStatus(),
                 model.getClientId()
         );
-
-        return dto;
     }
 }

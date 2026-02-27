@@ -22,8 +22,8 @@ public class ProjectValidator {
         validateForCreate(dto);
     }
 
-    public static void validateForDelete(int id) {
-        if (id <= 0) {
+    public static void validateForDelete(Long id) {
+        if (id == null || id <= 0) {
             throw new IllegalArgumentException("Valid project ID is required for deletion.");
         }
     }

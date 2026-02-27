@@ -34,8 +34,8 @@ public class UserValidator {
      *
      * @param id user ID
      */
-    public static void validateForDelete(int id) {
-        if (id <= 0)
+    public static void validateForDelete(Long id) {
+        if (id == null || id <= 0)
             throw new IllegalArgumentException("Valid user ID is required for deletion.");
     }
 
