@@ -1,4 +1,4 @@
-# CRM Studio
+# Mini CRM
 
 Aplicación web de gestión de clientes, proyectos y tareas. Desarrollada con Spring Boot 3, Thymeleaf, Spring Security y MySQL.
 
