@@ -29,6 +29,8 @@ public class TaskDTO {
      * @param deletedAt   soft delete timestamp
      */
 
+    public TaskDTO() {}
+
     public TaskDTO(Long id, String title, String description, TaskStatusEnum status,
                    Long projectId, LocalDate startDate, LocalDate dueDate, LocalDateTime deletedAt) {
         this.id = id;

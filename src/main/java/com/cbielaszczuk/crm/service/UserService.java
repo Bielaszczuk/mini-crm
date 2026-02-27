@@ -31,6 +31,14 @@ public class UserService {
      */
     public void register(UserRegistrationDTO registrationDTO) {
         UserValidator.validateRegistration(registrationDTO);
+
+        if (repository.existsByUsername(registrationDTO.getUsername())) {
+            throw new IllegalArgumentException("Username '" + registrationDTO.getUsername() + "' is already taken.");
+        }
+        if (repository.existsByEmail(registrationDTO.getEmail())) {
+            throw new IllegalArgumentException("Email '" + registrationDTO.getEmail() + "' is already registered.");
+        }
+
         UserModel model = new UserModel(
                 null,
                 registrationDTO.getName(),

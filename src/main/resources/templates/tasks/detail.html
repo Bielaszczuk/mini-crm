@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${task.title} + ' — CRM'">Task — CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{layouts/sidebar :: sidebar}"></div>
+    <div class="main">
+        <header class="topbar">
+            <span class="topbar-title" th:text="${task.title}">Task</span>
+            <div style="display:flex;gap:8px;">
+                <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-primary btn-sm">Edit</a>
+                <a th:href="@{/tasks}" class="btn btn-ghost btn-sm">Back</a>
+            </div>
+        </header>
+        <main class="content">
+
+            <div class="card" style="max-width:640px;">
+                <div class="card-header">
+                    <span class="card-title">Task Details</span>
+                    <span th:text="${task.status}"
+                          th:class="${task.status.name() == 'IN_PROGRESS'} ? 'badge badge-blue' :
+                                    (${task.status.name() == 'FINISHED'}   ? 'badge badge-green' :
+                                    (${task.status.name() == 'ON_HOLD'}    ? 'badge badge-amber' :
+                                    (${task.status.name() == 'CANCELLED'}  ? 'badge badge-red'  : 'badge badge-gray')))">
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="detail-section">
+                        <div class="detail-field">
+                            <span class="detail-label">Title</span>
+                            <span class="detail-value" th:text="${task.title}"></span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="detail-label">Description</span>
+                            <span class="detail-value"
+                                  th:text="${task.description != null and !#strings.isEmpty(task.description)} ? ${task.description} : '—'"
+                                  th:classappend="${task.description == null or #strings.isEmpty(task.description)} ? 'muted'"></span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="detail-label">Status</span>
+                            <span class="detail-value" th:text="${task.status}"></span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="detail-label">Start Date</span>
+                            <span class="detail-value" th:text="${task.startDate ?: '—'}"></span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="detail-label">Due Date</span>
+                            <span class="detail-value" th:text="${task.dueDate ?: '—'}"></span>
+                        </div>
+                        <div class="detail-field" th:if="${task.deletedAt != null}">
+                            <span class="detail-label">Deleted At</span>
+                            <span class="detail-value" th:text="${task.deletedAt}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

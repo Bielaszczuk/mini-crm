@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Projects — CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{layouts/sidebar :: sidebar}"></div>
+    <div class="main">
+        <header class="topbar">
+            <span class="topbar-title">Projects</span>
+            <a th:href="@{/projects/new}" class="btn btn-primary btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                New Project
+            </a>
+        </header>
+        <main class="content">
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                        <tr><th>Title</th><th>Status</th><th>Start</th><th>Due</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${projects}">
+                            <td th:text="${p.title}"></td>
+                            <td>
+                                <span th:text="${p.status}"
+                                      th:class="${p.status.name() == 'IN_PROGRESS'} ? 'badge badge-blue' :
+                                                (${p.status.name() == 'FINISHED'}   ? 'badge badge-green' :
+                                                (${p.status.name() == 'ON_HOLD'}    ? 'badge badge-amber' :
+                                                (${p.status.name() == 'CANCELLED'}  ? 'badge badge-red'  : 'badge badge-gray')))">
+                                </span>
+                            </td>
+                            <td th:text="${p.startDate}"></td>
+                            <td th:text="${p.dueDate}"></td>
+                            <td>
+                                <div class="actions">
+                                    <a th:href="@{/projects/{id}(id=${p.id})}" class="btn btn-ghost btn-sm">View</a>
+                                    <a th:href="@{/projects/{id}/edit(id=${p.id})}" class="btn btn-ghost btn-sm">Edit</a>
+                                    <form th:action="@{/projects/{id}/delete(id=${p.id})}" method="post"
+                                          data-confirm="Delete this project?">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(projects)}">
+                            <td colspan="5" class="table-empty">No projects found.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

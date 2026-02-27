@@ -22,6 +22,8 @@ public class UserRegistrationDTO {
      * @param password        password
      * @param confirmPassword confirmation of password
      */
+    public UserRegistrationDTO() {}
+
     public UserRegistrationDTO(String name, String email, String phone, String username, String password, String confirmPassword) {
         this.name = name;
         this.email = email;

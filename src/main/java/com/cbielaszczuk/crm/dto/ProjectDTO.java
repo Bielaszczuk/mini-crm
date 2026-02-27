@@ -23,6 +23,8 @@ public class ProjectDTO {
      * @param clientId the associated client ID
      */
 
+    public ProjectDTO() {}
+
     public ProjectDTO(Long id, String title, String description, LocalDate startDate, LocalDate dueDate, ProjectStatusEnum status, Long clientId) {
         this.id = id;
         this.title = title;

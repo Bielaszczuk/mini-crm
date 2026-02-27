@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dashboard — CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{layouts/sidebar :: sidebar}"></div>
+    <div class="main">
+        <header class="topbar">
+            <span class="topbar-title">Dashboard</span>
+        </header>
+        <main class="content">
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${totalClients}">0</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${totalProjects}">0</div>
+                        <div class="stat-label">Projects</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon amber">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    </div>
+                    <div>
+                        <div class="stat-value" th:text="${totalTasks}">0</div>
+                        <div class="stat-label">Tasks</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Clients</span>
+                        <a th:href="@{/clients}" class="btn btn-ghost btn-sm">View all</a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Name</th><th>Company</th><th>Email</th></tr></thead>
+                            <tbody>
+                            <tr th:each="c : ${recentClients}">
+                                <td th:text="${c.name}"></td>
+                                <td th:text="${c.company}"></td>
+                                <td th:text="${c.email}"></td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recentClients)}">
+                                <td colspan="3" class="table-empty">No clients yet.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Recent Projects</span>
+                        <a th:href="@{/projects}" class="btn btn-ghost btn-sm">View all</a>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Title</th><th>Status</th></tr></thead>
+                            <tbody>
+                            <tr th:each="p : ${recentProjects}">
+                                <td th:text="${p.title}"></td>
+                                <td>
+                                    <span th:text="${p.status}"
+                                          th:classappend="${p.status.name() == 'IN_PROGRESS'} ? 'badge badge-blue' :
+                                                          (${p.status.name() == 'FINISHED'}   ? 'badge badge-green' :
+                                                          (${p.status.name() == 'ON_HOLD'}    ? 'badge badge-amber' :
+                                                          (${p.status.name() == 'CANCELLED'}  ? 'badge badge-red'  : 'badge badge-gray')))">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(recentProjects)}">
+                                <td colspan="2" class="table-empty">No projects yet.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

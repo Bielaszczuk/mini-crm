@@ -13,7 +13,7 @@ import java.util.List;
  * Controller that exposes client-related operations to UI or test layer.
  */
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/api/clients")
 public class ClientController {
 
     private final ClientService service;

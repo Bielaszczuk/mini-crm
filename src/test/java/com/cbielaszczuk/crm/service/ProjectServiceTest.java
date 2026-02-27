@@ -28,7 +28,7 @@ class ProjectServiceTest {
     private ClientService clientService;
 
     private Long createTestClient() {
-        ClientDTO dto = new ClientDTO(null, "Test Client", "testclient" + System.nanoTime() + "@test.com", "000", "Corp", "");
+        ClientDTO dto = new ClientDTO(null, "Test Client", "testclient" + System.nanoTime() + "@test.com", "+54 11 1234-5678", "Corp", "");
         clientService.createClient(dto);
         return clientService.getAllClients().stream()
                 .filter(c -> c.getEmail().contains("testclient"))

@@ -33,7 +33,7 @@ public class TaskServiceTest {
     private ClientService clientService;
 
     private Long createTestProject() {
-        ClientDTO clientDTO = new ClientDTO(null, "Client", "client" + System.nanoTime() + "@test.com", "000", "Corp", "");
+        ClientDTO clientDTO = new ClientDTO(null, "Client", "client" + System.nanoTime() + "@test.com", "+54 11 1234-5678", "Corp", "");
         clientService.createClient(clientDTO);
         Long clientId = clientService.getAllClients().stream()
                 .reduce((first, second) -> second).orElseThrow().getId();

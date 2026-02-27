@@ -9,6 +9,8 @@ public class ClientDTO {
     private String company;
     private String notes;
 
+    public ClientDTO() {}
+
     public ClientDTO(Long id, String name, String email, String phone, String company, String notes) {
         this.id = id;
         this.name = name;

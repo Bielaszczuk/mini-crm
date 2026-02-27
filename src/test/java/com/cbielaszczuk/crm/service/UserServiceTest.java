@@ -26,7 +26,7 @@ class UserServiceTest {
     @Test
     void register_shouldPersistUser() {
         UserRegistrationDTO dto = new UserRegistrationDTO(
-                "Juan Tester", "juan@test.com", "999", "juantest", "secret", "secret"
+                "Juan Tester", "juan@test.com", "+54 11 1234-5678", "juantest", "secret123", "secret123"
         );
 
         assertDoesNotThrow(() -> service.register(dto));
@@ -38,7 +38,7 @@ class UserServiceTest {
     @Test
     void login_shouldReturnUserOnValidCredentials() {
         UserRegistrationDTO reg = new UserRegistrationDTO(
-                "Login User", "loginuser@test.com", "000", "loginuser", "pass123", "pass123"
+                "Login User", "loginuser@test.com", "+54 11 1111-2222", "loginuser", "pass123", "pass123"
         );
         service.register(reg);
 
@@ -52,7 +52,7 @@ class UserServiceTest {
     @Test
     void login_shouldThrowOnInvalidPassword() {
         UserRegistrationDTO reg = new UserRegistrationDTO(
-                "Login User2", "loginuser2@test.com", "000", "loginuser2", "pass123", "pass123"
+                "Login User2", "loginuser2@test.com", "+54 11 3333-4444", "loginuser2", "pass123", "pass123"
         );
         service.register(reg);
 
@@ -63,7 +63,7 @@ class UserServiceTest {
     @Test
     void updateUser_shouldChangeData() {
         UserRegistrationDTO reg = new UserRegistrationDTO(
-                "Original Name", "original@test.com", "111", "usertoUpdate", "pass", "pass"
+                "Original Name", "original@test.com", "+54 11 5555-6666", "usertoUpdate", "pass123", "pass123"
         );
         service.register(reg);
 
@@ -82,7 +82,7 @@ class UserServiceTest {
     @Test
     void deleteUser_shouldRemoveUser() {
         UserRegistrationDTO reg = new UserRegistrationDTO(
-                "To Delete", "delete@test.com", "222", "userToDelete", "pass", "pass"
+                "To Delete", "delete@test.com", "+54 11 7777-8888", "userToDelete", "pass123", "pass123"
         );
         service.register(reg);
 

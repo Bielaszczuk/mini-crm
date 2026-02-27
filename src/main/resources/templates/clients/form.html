@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${isEdit} ? 'Edit Client — CRM' : 'New Client — CRM'">Client — CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+<div class="layout">
+    <div th:replace="~{layouts/sidebar :: sidebar}"></div>
+    <div class="main">
+        <header class="topbar">
+            <span class="topbar-title" th:text="${isEdit} ? 'Edit Client' : 'New Client'">Client</span>
+            <a th:href="@{/clients}" class="btn btn-ghost btn-sm">Back</a>
+        </header>
+        <main class="content">
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <div class="card" style="max-width:680px;">
+                <div class="card-body">
+                    <form th:action="${isEdit} ? @{/clients/{id}/edit(id=${client.id})} : @{/clients/new}"
+                          th:object="${client}" method="post">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Full Name *</label>
+                                <input id="name" type="text" th:field="*{name}" placeholder="John Doe" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="company">Company</label>
+                                <input id="company" type="text" th:field="*{company}" placeholder="Acme Inc."/>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input id="email" type="email" th:field="*{email}" placeholder="john@example.com" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone *</label>
+                                <input id="phone" type="text" th:field="*{phone}" placeholder="+54 11 1234-5678" required/>
+                            </div>
+                            <div class="form-group full">
+                                <label for="notes">Notes</label>
+                                <textarea id="notes" th:field="*{notes}" placeholder="Additional notes..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary"
+                                    th:text="${isEdit} ? 'Save changes' : 'Create client'">Submit</button>
+                            <a th:href="@{/clients}" class="btn btn-ghost">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

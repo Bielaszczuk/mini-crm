@@ -1,97 +1,59 @@
-# CRMApp – Mini CRM en JavaFX
+# CRM Studio
 
-Una aplicación de escritorio sencilla de gestión de clientes, proyectos y tareas. Desarrollada en Java 21 con JavaFX y arquitectura profesional (MVC, DTO, Repository, Service, Validation).
+Aplicación web de gestión de clientes, proyectos y tareas. Desarrollada con Spring Boot 3, Thymeleaf, Spring Security y MySQL.
 
-## 🚀 Instalación rápida
+## Funcionalidad
 
-### macOS
-## 📦 Descargas
+- **Autenticación** — registro e inicio de sesión con contraseñas hasheadas con BCrypt. Todas las rutas requieren autenticación.
+- **Clientes** — CRUD completo: crear, ver, editar y eliminar clientes. El detalle de cada cliente muestra sus proyectos asociados.
+- **Proyectos** — CRUD completo con seguimiento de estado (En progreso, En espera, Finalizado, Cancelado). Los proyectos están vinculados a un cliente. El detalle muestra las tareas asociadas.
+- **Tareas** — CRUD completo con seguimiento de estado. Las tareas están vinculadas a un proyecto.
+- **Dashboard** — resumen de totales de clientes, proyectos y tareas con actividad reciente.
+- **API REST** — todas las entidades también están expuestas bajo `/api/*` para consumo externo.
 
-- [ Descargar para macOS (.dmg)](https://github.com/1337B/mini-crm/releases/download/v1.0.0/CRMApp-1.0.dmg)
+## Cómo levantar el proyecto
 
-O
-1. Ir a la sección [Releases](https://github.com/TU_USUARIO/TU_REPO/releases).
-2. Descargar el archivo `CRMApp.dmg`.
-3. Abrir el `.dmg` y arrastrar `CRMApp` a la carpeta **Aplicaciones**.
-4. Hacer doble clic sobre la app para comenzar.
+### Requisitos
 
- No es necesario instalar Java ni JavaFX. Todo viene embebido.
-
->  Si al abrir la app aparece un mensaje de seguridad de Apple, hacé clic derecho → **Abrir** la primera vez.
-
----
-
-### 🪟 Windows (próximamente)
-
-Se publicará un instalador `.exe` cuando se compile desde una PC con Windows.
-
----
-
-## 🔧 Requisitos para compilar desde código fuente
-
-- Java 21 o superior
+- Java 21
 - Maven 3.9+
-- JavaFX SDK (solo si querés correrlo manualmente)
-- JavaFX JMODs (solo si querés empaquetarlo con `jpackage`)
+- MySQL 8+
 
-## 💻 Compilar desde código
+### Configuración de la base de datos
+
+Crear la base de datos antes de iniciar:
+
+```sql
+CREATE DATABASE crm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### Configuración
+
+Las credenciales de la base de datos se configuran en `src/main/resources/application-prod.properties`. Por defecto conecta a `localhost:3306/crm` con usuario `root` sin contraseña. Ajustar según el entorno.
+
+### Iniciar
 
 ```bash
-git clone https://github.com/1337B/mini-crm.git
-cd crm
-mvn clean package
-```
-## Para ejecutar:
-
-```
-java --module-path /ruta/a/javafx-sdk-XX/lib \
---add-modules javafx.controls,javafx.fxml \
--jar target/crm-1.0-SNAPSHOT-jar-with-dependencies.jar
+mvn spring-boot:run
 ```
 
-## 📦 Crear instalador (solo si querés empaquetar)
-```
-jlink \
---module-path "/ruta/a/javafx-jmods:$JAVA_HOME/jmods" \
---add-modules java.base,java.logging,java.sql,java.xml,javafx.controls,javafx.fxml \
---output custom-runtime
+La aplicación inicia en `http://localhost:8080`. Se redirige automáticamente al login.
+
+Para iniciar con un perfil específico:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-```
-jpackage \
---type dmg \
---name CRMApp \
---input target \
---main-jar crm-1.0-SNAPSHOT-jar-with-dependencies.jar \
---main-class com.cbielaszczuk.crm.ui.MainApp \
---dest dist \
---app-version 1.0 \
---runtime-image custom-runtime
-🧠 Arquitectura
-Java 21 + JavaFX 20+
-```
-## H2 Database (persistente, archivo local)
+### Tests
 
-DTOs, Validators, Repositories, Services, Mappers
+Los tests corren contra una base de datos H2 en memoria a través del perfil `test`:
 
-JavaFX con FXML (separación de UI y lógica)
-
-Testing con JUnit 5
-
-📁 Estructura del proyecto
+```bash
+mvn test
 ```
-├── src/main/java/com/cbielaszczuk/crm
-│   ├── config/
-│   ├── controller/
-│   ├── dto/
-│   ├── mapper/
-│   ├── model/
-│   ├── repository/
-│   ├── service/
-│   ├── ui/
-│   └── validation/
-├── src/main/resources/views/
-├── target/
-├── database/
-└── dist/ 
-```
+
+## Migración
+
+El proyecto fue originalmente una aplicación de escritorio en JavaFX con JDBC plano y H2. Fue migrado a Spring Boot 3 como aplicación web completa. La migración implicó reemplazar JDBC por Spring Data JPA con Hibernate, incorporar Spring Security con BCrypt, reemplazar la interfaz JavaFX por plantillas Thymeleaf renderizadas en el servidor, y agregar una capa de API REST. El modelo de dominio, DTOs, validadores y lógica de negocio fueron preservados y adaptados al modelo de componentes de Spring.
