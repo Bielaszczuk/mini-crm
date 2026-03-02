@@ -16,6 +16,10 @@ public class ClientModel extends PersonModel {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserModel user;
+
     public ClientModel() {
         super();
     }
@@ -48,5 +52,13 @@ public class ClientModel extends PersonModel {
 
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public UserModel getUser() {
+        return user;
+    }
+
+    public void setUser(UserModel user) {
+        this.user = user;
     }
 }

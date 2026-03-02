@@ -78,6 +78,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Spring Security Test - Para @WithMockUser -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- Lombok - Opcional pero recomendado para reducir boilerplate -->
         <dependency>

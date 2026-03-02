@@ -2,10 +2,13 @@ package com.cbielaszczuk.crm.service;
 
 import com.cbielaszczuk.crm.dto.ClientDTO;
 import com.cbielaszczuk.crm.dto.ProjectDTO;
+import com.cbielaszczuk.crm.dto.UserRegistrationDTO;
 import com.cbielaszczuk.crm.model.ProjectStatusEnum;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@WithMockUser(username = "testuser")
 class ProjectServiceTest {
 
     @Autowired
@@ -26,6 +30,20 @@ class ProjectServiceTest {
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private UserService userService;
+
+    @BeforeEach
+    void setUp() {
+        try {
+            userService.register(new UserRegistrationDTO(
+                    "Test User", "testuser@test.com", "1234567890",
+                    "testuser", "password123", "password123"
+            ));
+        } catch (IllegalArgumentException ignored) {
+        }
+    }
 
     private Long createTestClient() {
         ClientDTO dto = new ClientDTO(null, "Test Client", "testclient" + System.nanoTime() + "@test.com", "+54 11 1234-5678", "Corp", "");
