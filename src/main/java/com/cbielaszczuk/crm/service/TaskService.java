@@ -76,6 +76,14 @@ public class TaskService {
             existing.setProject(project);
         }
 
+        if (dto.getStatus() != null && existing.getStatus() != dto.getStatus()) {
+            if (!existing.getStatus().isValidTransition(dto.getStatus())) {
+                throw new IllegalArgumentException(
+                    "Invalid status transition from " + existing.getStatus() + " to " + dto.getStatus()
+                );
+            }
+        }
+
         existing.setTitle(dto.getTitle());
         existing.setDescription(dto.getDescription());
         existing.setStatus(dto.getStatus());

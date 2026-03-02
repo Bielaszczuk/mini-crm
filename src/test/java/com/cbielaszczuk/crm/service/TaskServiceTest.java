@@ -95,11 +95,11 @@ public class TaskServiceTest {
         Long projectId = createTestProject();
         TaskDTO created = createTestTask(projectId);
 
-        created.setStatus(TaskStatusEnum.FINISHED);
+        created.setStatus(TaskStatusEnum.IN_PROGRESS);
         taskService.updateTask(created);
 
         TaskDTO updated = taskService.getTaskById(created.getId());
-        assertEquals(TaskStatusEnum.FINISHED, updated.getStatus());
+        assertEquals(TaskStatusEnum.IN_PROGRESS, updated.getStatus());
     }
 
     @Test
