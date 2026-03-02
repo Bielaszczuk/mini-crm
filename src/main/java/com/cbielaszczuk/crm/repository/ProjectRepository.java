@@ -12,5 +12,7 @@ public interface ProjectRepository extends JpaRepository<ProjectModel, Long> {
     List<ProjectModel> findByStatus(ProjectStatusEnum status);
     @Query("SELECT p FROM ProjectModel p WHERE p.client.id = :clientId AND p.deletedAt IS NULL")
     List<ProjectModel> findByClientId(Long clientId);
+    @Query("SELECT p FROM ProjectModel p WHERE p.client.id = :clientId")
+    List<ProjectModel> findAllByClientId(Long clientId);
     List<ProjectModel> findByTitleContainingIgnoreCase(String title);
 }

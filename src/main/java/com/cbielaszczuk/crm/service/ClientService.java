@@ -3,11 +3,16 @@ package com.cbielaszczuk.crm.service;
 import com.cbielaszczuk.crm.dto.ClientDTO;
 import com.cbielaszczuk.crm.mapper.ClientMapper;
 import com.cbielaszczuk.crm.model.ClientModel;
+import com.cbielaszczuk.crm.model.ProjectModel;
+import com.cbielaszczuk.crm.model.TaskModel;
 import com.cbielaszczuk.crm.repository.ClientRepository;
+import com.cbielaszczuk.crm.repository.ProjectRepository;
+import com.cbielaszczuk.crm.repository.TaskRepository;
 import com.cbielaszczuk.crm.validation.ClientValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,9 +24,13 @@ import java.util.stream.Collectors;
 public class ClientService {
 
     private final ClientRepository repository;
+    private final ProjectRepository projectRepository;
+    private final TaskRepository taskRepository;
 
-    public ClientService(ClientRepository repository) {
+    public ClientService(ClientRepository repository, ProjectRepository projectRepository, TaskRepository taskRepository) {
         this.repository = repository;
+        this.projectRepository = projectRepository;
+        this.taskRepository = taskRepository;
     }
 
     /**
@@ -49,14 +58,15 @@ public class ClientService {
     }
 
     /**
-     * Finds a client by ID.
+     * Finds a client by ID (only if not soft-deleted).
      *
      * @param id client ID
-     * @return DTO if found, null otherwise
+     * @return DTO if found and not deleted, null otherwise
      */
     @Transactional(readOnly = true)
     public ClientDTO getClientById(Long id) {
         return repository.findById(id)
+                .filter(client -> client.getDeletedAt() == null)
                 .map(ClientMapper::toDTO)
                 .orElse(null);
     }
@@ -73,12 +83,34 @@ public class ClientService {
     }
 
     /**
-     * Soft deletes a client.
+     * Soft deletes a client by setting deletedAt timestamp.
+     * Also soft deletes all associated projects and their tasks.
      *
      * @param id ID of the client to delete
      */
     public void deleteClient(Long id) {
         ClientValidator.validateForDelete(id);
-        repository.deleteById(id);
+        ClientModel client = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Client not found with id: " + id));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        List<ProjectModel> projects = projectRepository.findAllByClientId(id);
+        for (ProjectModel project : projects) {
+            List<TaskModel> tasks = taskRepository.findAllByProjectId(project.getId());
+            for (TaskModel task : tasks) {
+                if (task.getDeletedAt() == null) {
+                    task.setDeletedAt(now);
+                    taskRepository.save(task);
+                }
+            }
+            if (project.getDeletedAt() == null) {
+                project.setDeletedAt(now);
+                projectRepository.save(project);
+            }
+        }
+
+        client.setDeletedAt(now);
+        repository.save(client);
     }
 }

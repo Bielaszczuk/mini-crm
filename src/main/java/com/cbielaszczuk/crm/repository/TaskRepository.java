@@ -12,5 +12,7 @@ public interface TaskRepository extends JpaRepository<TaskModel, Long> {
     List<TaskModel> findByStatus(TaskStatusEnum status);
     @Query("SELECT t FROM TaskModel t WHERE t.project.id = :projectId AND t.deletedAt IS NULL")
     List<TaskModel> findByProjectId(Long projectId);
+    @Query("SELECT t FROM TaskModel t WHERE t.project.id = :projectId")
+    List<TaskModel> findAllByProjectId(Long projectId);
     List<TaskModel> findByTitleContainingIgnoreCase(String title);
 }
